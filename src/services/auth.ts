@@ -1,12 +1,5 @@
-import axios from 'axios';
+import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo } from '@/types/auth';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-});
 
 export const authService = {
   async login(data: LoginRequest): Promise<string> {

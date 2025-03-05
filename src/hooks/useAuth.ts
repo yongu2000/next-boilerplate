@@ -15,7 +15,10 @@ export const useAuth = create(
       user: null,
       isAuthenticated: false,
       setAuth: (user) => set({ user, isAuthenticated: true }),
-      clearAuth: () => set({ user: null, isAuthenticated: false }),
+      clearAuth: () => {
+        localStorage.removeItem('accessToken'); // localStorage에서 토큰 삭제
+        set({ user: null, isAuthenticated: false });
+      },
     }),
     {
       name: 'auth-storage', // localStorage에 저장될 키 이름
