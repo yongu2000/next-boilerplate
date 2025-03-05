@@ -38,7 +38,7 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    // 서버에 로그아웃 요청을 보내거나, 로컬에서 처리
+    await axiosInstance.post('/logout');
     return Promise.resolve();
   },
 
