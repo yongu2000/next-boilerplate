@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import { toast } from 'react-hot-toast';
 
-const publicRoutes = ["/", "/login", "/register", /^\/posts\/\d+$/];
+const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/];
 
 export default function ClientLayout({
   children,
@@ -74,7 +74,7 @@ export default function ClientLayout({
                     로그인
                   </Link>
                   <Link 
-                    href="/register"
+                    href="/join"
                     className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-medium"
                   >
                     회원가입

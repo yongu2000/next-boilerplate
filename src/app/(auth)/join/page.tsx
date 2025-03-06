@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: any) => {
     try {
-      await authService.register({
+      await authService.join({
         email: data.email,
         password: data.password,
       });

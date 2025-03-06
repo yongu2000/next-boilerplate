@@ -2,6 +2,13 @@ import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo } from '@/types/auth';
 import { useAuth } from '@/hooks/useAuth';
 
+interface JoinRequest {
+  email: string;
+  username: string;
+  password: string;
+  name: string;
+}
+
 export const authService = {
   async login(data: LoginRequest): Promise<string> {
     const response = await axiosInstance.post('/login', data);
@@ -44,8 +51,15 @@ export const authService = {
     }
   },
 
-  async register(data: { email: string; password: string }): Promise<void> {
-    await axiosInstance.post('/register', data);
+  async join(data: { email: string; password: string }): Promise<void> {
+    const joinData: JoinRequest = {
+      email: data.email,
+      username: data.email,
+      password: data.password,
+      name: data.email.split('@')[0]
+    };
+    
+    await axiosInstance.post('/join', joinData);
   }
 };
 
