@@ -29,6 +29,18 @@ export const postService = {
 
   async deletePost(id: number): Promise<void> {
     await axiosInstance.delete(`/posts/${id}`);
+  },
+
+  async createComment(postId: number, data: { content: string; parentCommentId: number | null }): Promise<void> {
+    await axiosInstance.post(`/posts/${postId}/comments`, data);
+  },
+
+  async updateComment(postId: number, commentId: number, content: string): Promise<void> {
+    await axiosInstance.put(`/posts/${postId}/comments/${commentId}`, { content });
+  },
+
+  async deleteComment(postId: number, commentId: number): Promise<void> {
+    await axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
   }
 };
 

@@ -18,9 +18,10 @@ export interface Post {
     content: string;
     user: {
       id: number;
-      username: string;
       name: string;
     };
+    parentComment?: Comment;
+    replies?: Comment[];
     createdAt: string;
     modifiedAt: string;
   }

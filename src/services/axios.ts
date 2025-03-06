@@ -8,12 +8,12 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// `useAuth`를 직접 사용할 수 없으므로, `logoutAndRedirect()` 함수 생성
-export const logoutAndRedirect = () => {
-  localStorage.removeItem('accessToken'); // ✅ localStorage에서 토큰 삭제
-  const authStore = useAuth.getState(); // ✅ Zustand의 useAuth 상태 가져오기
-  authStore.clearAuth(); // ✅ 상태 초기화
-  window.location.href = '/login'; // ✅ 로그인 페이지로 이동
+// 인증 관련 처리를 위한 함수
+export const handleAuthError = () => {
+  localStorage.removeItem('accessToken');
+  const authStore = useAuth.getState();
+  authStore.clearAuth();
+  window.location.href = '/login';
 };
 
 // API 요청 시 인터셉터를 통해 Access Token 자동 첨부
@@ -46,22 +46,18 @@ const reissueAccessToken = async () => {
       throw new Error("새로운 Access Token이 응답에 포함되지 않았습니다.");
     }
   } catch (error) {
-    logoutAndRedirect(); // 🔥 토큰 재발급 실패 시 로그아웃 처리
+    handleAuthError();
     throw error;
   }
 };
 
-// 401 또는 403 에러 발생 시 처리
+// 에러 처리 인터셉터
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config!;
 
-    if (!(originalRequest as any)._retry) {
-      (originalRequest as any)._retry = false;
-    }
-    
-    // 🔥 401 에러 & 토큰 재발급 신호 존재 시 재발급 요청
+    // 1. 토큰 재발급이 필요한 경우 (401 + 재발급 헤더)
     if (
       error.response?.status === 401 && 
       error.response.headers['x-reissue-token'] === 'true' &&
@@ -79,16 +75,21 @@ axiosInstance.interceptors.response.use(
         }
         return axiosInstance(originalRequest);
       } catch (reissueError) {
-        logoutAndRedirect();
         return Promise.reject(reissueError);
       }
     }
 
-    // 🔥 403 에러 발생 시 → 강제 로그아웃 및 로그인 페이지로 이동
-    if (error.response?.status === 403) {
-      logoutAndRedirect();
+    // 2. 인증 관련 에러 처리 (401, 403)
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // 로그인 페이지가 아닐 때만 현재 URL 저장
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        localStorage.setItem('redirectAfterLogin', window.location.pathname);
+      }
+      handleAuthError();
+      return Promise.reject(error);
     }
 
+    // 3. 그 외 모든 에러는 컴포넌트에서 처리
     return Promise.reject(error);
   }
 );

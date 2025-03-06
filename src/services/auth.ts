@@ -1,5 +1,6 @@
 import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo } from '@/types/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 export const authService = {
   async login(data: LoginRequest): Promise<string> {
@@ -31,8 +32,16 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    await axiosInstance.post('/logout');
-    return Promise.resolve();
+    try {
+      await axiosInstance.post('/auth/logout');
+      // 로그아웃 후 인증 상태 초기화 및 리다이렉트
+      const authStore = useAuth.getState();
+      authStore.clearAuth();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      throw error;
+    }
   },
 
   async register(data: { email: string; password: string }): Promise<void> {
