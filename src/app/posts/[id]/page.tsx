@@ -110,6 +110,17 @@ export default function PostDetailPage() {
     }
   };
 
+  // 댓글 수정 후 게시글 새로 불러오기를 위한 핸들러
+  const handleCommentUpdate = async (commentId: number) => {
+    try {
+      const response = await postService.getPost(post!.id);
+      setPost(response);
+    } catch (error) {
+      console.error('게시글 새로고침 실패:', error);
+      toast.error('최신 댓글을 불러오는데 실패했습니다.');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -207,7 +218,7 @@ export default function PostDetailPage() {
               {post.comments?.length > 0 ? (
                 <div className="space-y-6">
                   {post.comments
-                    .filter(comment => !comment.parentComment) // 최상위 댓글만 표시
+                    .filter(comment => comment.parentCommentId === null) // 최상위 댓글만 필터링
                     .map((comment) => (
                       <CommentComponent
                         key={comment.id}
@@ -215,6 +226,7 @@ export default function PostDetailPage() {
                         postId={post.id}
                         onDelete={handleCommentDelete}
                         onReply={handleReplySubmit}
+                        onUpdate={handleCommentUpdate}
                       />
                     ))}
                 </div>

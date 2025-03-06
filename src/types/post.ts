@@ -20,8 +20,8 @@ export interface Post {
       id: number;
       name: string;
     };
-    parentComment?: Comment;
-    replies?: Comment[];
+    parentCommentId: number | null;
+    replies: Comment[];
     createdAt: string;
     modifiedAt: string;
   }
