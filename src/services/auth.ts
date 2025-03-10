@@ -40,7 +40,7 @@ export const authService = {
 
   async logout(): Promise<void> {
     try {
-      await axiosInstance.post('/auth/logout');
+      await axiosInstance.post('/logout');
       // 로그아웃 후 인증 상태 초기화 및 리다이렉트
       const authStore = useAuth.getState();
       authStore.clearAuth();

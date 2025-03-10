@@ -85,7 +85,7 @@ export default function ListPostsPage() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await postService.getAllPosts(page, size);
+                const response = await postService.getAllPostsByPage(page, size);
                 setPosts(response.content);
                 setTotalPages(response.totalPages);
             } catch (error) {
@@ -133,9 +133,9 @@ export default function ListPostsPage() {
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <Link href={`/posts/${post.id}`} className="text-indigo-600 hover:text-indigo-900">
                                         {post.title}
-                                        {post.commentCount > 0 && (
+                                        {post.commentCounts > 0 && (
                                             <span className="ml-2 text-gray-500">
-                                                [{post.commentCount}]
+                                                [{post.commentCounts}]
                                             </span>
                                         )}
                                     </Link>

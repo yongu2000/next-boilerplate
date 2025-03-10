@@ -43,7 +43,7 @@ export interface PostSummary {
       username: string;
       name: string;
   };
-  commentCount: number;
+  commentCounts: number;
   createdAt: string;
   modifiedAt: string;
 }

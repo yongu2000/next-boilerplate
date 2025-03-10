@@ -7,12 +7,12 @@ export const postService = {
     return response.data;
   },
 
-  async getAllPosts(page = 0, size = 10): Promise<PostPage> {
-    const response = await axiosInstance.get(`/posts?page=${page}&size=${size}`);
+  async getAllPostsByPage(page = 0, size = 10): Promise<PostPage> {
+    const response = await axiosInstance.get(`/posts/list?page=${page}&size=${size}`);
     return response.data;
 },
 
-async getPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<PostSummary>> {
+async getAllPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<PostSummary>> {
   const params = new URLSearchParams();
   if (cursor) params.append('cursor', cursor.toString());
   params.append('size', size.toString());
