@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import { toast } from 'react-hot-toast';
 
-const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/];
+const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/, "/posts/grid", "/posts/list"];
 
 export default function ClientLayout({
   children,

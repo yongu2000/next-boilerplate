@@ -1,5 +1,5 @@
 import { axiosInstance } from './axios';
-import { Post } from '@/types/post';
+import { Post, PostPage, PostSummary, CursorResponse } from '@/types/post';
 
 export const postService = {
   async getMyPosts(): Promise<Post[]> {
@@ -7,10 +7,19 @@ export const postService = {
     return response.data;
   },
 
-  async getAllPosts(): Promise<Post[]> {
-    const response = await axiosInstance.get('/posts');
+  async getAllPosts(page = 0, size = 10): Promise<PostPage> {
+    const response = await axiosInstance.get(`/posts?page=${page}&size=${size}`);
     return response.data;
-  },
+},
+
+async getPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<PostSummary>> {
+  const params = new URLSearchParams();
+  if (cursor) params.append('cursor', cursor.toString());
+  params.append('size', size.toString());
+  
+  const response = await axiosInstance.get(`/posts/grid?${params}`);
+  return response.data;
+},
 
   async getPost(id: number): Promise<Post> {
     const response = await axiosInstance.get(`/posts/${id}`);
