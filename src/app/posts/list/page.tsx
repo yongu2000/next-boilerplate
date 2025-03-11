@@ -120,6 +120,9 @@ export default function ListPostsPage() {
                                 작성일
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                조회수
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 좋아요
                             </th>
                         </tr>
@@ -145,6 +148,9 @@ export default function ListPostsPage() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {format(new Date(post.createdAt), 'yyyy.MM.dd', { locale: ko })}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {post.viewCounts}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {post.likes}

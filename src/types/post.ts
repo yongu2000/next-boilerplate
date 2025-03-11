@@ -3,6 +3,7 @@ export interface Post {
     title: string;
     content: string;
     likes: number;
+    viewCounts: number;
     user: {
       id: number;
       username: string;
@@ -12,6 +13,23 @@ export interface Post {
     createdAt: string;
     modifiedAt: string;
   }
+
+    // types/post.ts
+  export interface PostSummary {
+    id: number;
+    title: string;
+    content: string;
+    likes: number;
+    viewCounts: number;  // 추가
+    user: {
+        id: number;
+        username: string;
+        name: string;
+    };
+    commentCounts: number;
+    createdAt: string;
+    modifiedAt: string;
+}
   
   export interface Comment {
     id: number;
@@ -32,21 +50,7 @@ export interface Post {
     hasNext: boolean;
 }
 
-  // types/post.ts
-export interface PostSummary {
-  id: number;
-  title: string;
-  content: string;
-  likes: number;
-  user: {
-      id: number;
-      username: string;
-      name: string;
-  };
-  commentCounts: number;
-  createdAt: string;
-  modifiedAt: string;
-}
+
 
 export interface PostPage {
   content: PostSummary[];
