@@ -3,6 +3,7 @@ export interface UserInfo {
     username: string;
     name: string;
     email: string;
+    createdAt: string;
   }
   
   export interface LoginRequest {

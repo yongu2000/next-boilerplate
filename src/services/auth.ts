@@ -33,7 +33,7 @@ export const authService = {
     await axiosInstance.put('/user', data);
   },
 
-  async getCurrentUser(): Promise<{ username: string; name: string }> {
+  async getCurrentUser(): Promise<UserInfo> {
     const response = await axiosInstance.get('/user');
     return response.data;
   },

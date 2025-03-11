@@ -50,8 +50,6 @@ export interface Post {
     hasNext: boolean;
 }
 
-
-
 export interface PostPage {
   content: PostSummary[];
   totalElements: number;

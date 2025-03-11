@@ -47,16 +47,10 @@ export default function ClientLayout({
                     환영합니다, <span className="text-indigo-600">{user?.name}</span>님
                   </span>
                   <Link
-                    href="/my-posts"
+                    href="/mypage"
                     className="text-gray-700 hover:text-indigo-600 transition-colors duration-200 font-medium"
                   >
-                    내 글
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="text-gray-700 hover:text-indigo-600 transition-colors duration-200 font-medium"
-                  >
-                    프로필 수정
+                    마이페이지
                   </Link>
                   <button
                     onClick={handleLogout}

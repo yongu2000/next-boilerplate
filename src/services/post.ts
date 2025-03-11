@@ -40,6 +40,23 @@ async getAllPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<Pos
     await axiosInstance.delete(`/posts/${id}`);
   },
 
+  async likePost(postId: number): Promise<void> {
+    await axiosInstance.post(`/posts/${postId}/like`);
+  },
+
+  async dislikePost(postId: number): Promise<void> {
+    await axiosInstance.post(`/posts/${postId}/dislike`);
+  },
+
+  async getLikeStatus(postId: number): Promise<boolean> {
+    try {
+        const response = await axiosInstance.get(`/posts/${postId}/like/status`);
+        return response.data.liked;
+    } catch (error) {
+        return false;
+    }
+  },
+
   async createComment(postId: number, data: { content: string; parentCommentId: number | null }): Promise<void> {
     await axiosInstance.post(`/posts/${postId}/comments`, data);
   },

@@ -14,9 +14,9 @@ export default function NewPostPage() {
     e.preventDefault();
 
     try {
-      await postService.createPost({ title, content });
+      const post = await postService.createPost({ title, content });
       toast.success('글이 성공적으로 작성되었습니다!');
-      router.push('/my-posts');
+      router.push(`/posts/${post.id}`);  // 작성된 게시글의 상세 페이지로 이동
     } catch (error) {
       console.error('글 작성 실패:', error);
       toast.error('글 작성에 실패했습니다. 다시 시도해주세요.');

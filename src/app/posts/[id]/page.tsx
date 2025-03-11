@@ -7,7 +7,8 @@ import { postService } from '@/services/post';
 import { Post } from '@/types/post';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
-import CommentComponent from '@/components/Comment';
+import CommentComponent from '@/components/post/Comment';
+import PostHeader from '@/components/post/PostHeader';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -16,6 +17,8 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [commentContent, setCommentContent] = useState('');
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -36,6 +39,20 @@ export default function PostDetailPage() {
     fetchPost();
   }, [params.id, router]);
 
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (post && isAuthenticated) {
+        const liked = await postService.getLikeStatus(post.id);
+        setIsLiked(liked);
+      }
+    };
+
+    if (post) {
+      setLikeCount(post.likes);
+      fetchLikeStatus();
+    }
+  }, [post, isAuthenticated]);
+
   const handleDelete = async () => {
     if (!post || !window.confirm('정말로 이 글을 삭제하시겠습니까?')) return;
 
@@ -46,6 +63,33 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error('글 삭제 실패:', error);
       toast.error('글 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleLikeClick = async () => {
+    if (!isAuthenticated) {
+        toast.error('좋아요를 하려면 로그인이 필요합니다.');
+        router.push('/login');
+        return;
+    }
+
+    // 즉각적인 UI 업데이트
+    setIsLiked(prev => !prev);
+    setLikeCount(prev => prev + (isLiked ? -1 : 1));
+
+    try {
+        if (isLiked) {
+            await postService.dislikePost(post!.id);
+        } else {
+            await postService.likePost(post!.id);
+        }
+        toast.success(isLiked ? '좋아요가 취소되었습니다.' : '좋아요를 눌렀습니다.');
+    } catch (error) {
+        // 실패 시 상태 롤백
+        setIsLiked(prev => !prev);
+        setLikeCount(prev => prev + (isLiked ? 1 : -1));
+        console.error('좋아요 처리 실패:', error);
+        toast.error('좋아요 처리에 실패했습니다.');
     }
   };
 
@@ -159,61 +203,19 @@ export default function PostDetailPage() {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-8">
-            {/* 글 헤더 */}
-            <div className="border-b pb-4 mb-6">
-              <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {post.title}
-                </h1>
-                {user?.id === post.user.id && (
-                  <div className="flex space-x-4">
-                    <Link
-                      href={`/posts/${post.id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-500"
-                    >
-                      수정
-                    </Link>
-                    <button
-                      onClick={handleDelete}
-                      className="text-red-600 hover:text-red-500"
-                    >
-                      삭제
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                <div className="flex items-center space-x-4">
-                  <span>작성자: {post.user.name}</span>
-                  <span>작성일: {new Date(post.createdAt).toLocaleDateString()}</span>
-                  {post.modifiedAt !== post.createdAt && (
-                    <span>수정일: {new Date(post.modifiedAt).toLocaleDateString()}</span>
-                  )}
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="flex items-center">
-                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                    </svg>
-                    조회 {post.viewCounts}
-                  </span>
-                  <span className="flex items-center">
-                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                    </svg>
-                    좋아요 {post.likes}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <PostHeader 
+              post={post}
+              isLiked={isLiked}
+              likeCount={likeCount}
+              onLikeClick={handleLikeClick}
+              onDelete={handleDelete}
+              isAuthor={user?.id === post.user.id}
+            />
 
-            {/* 글 내용 */}
             <div className="prose max-w-none">
               <p className="whitespace-pre-wrap text-gray-800">{post.content}</p>
             </div>
 
-            {/* 댓글 섹션 */}
             <div className="mt-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">댓글</h2>
               {post.comments?.length > 0 ? (
@@ -235,7 +237,6 @@ export default function PostDetailPage() {
                 <p className="text-gray-500">아직 댓글이 없습니다.</p>
               )}
 
-              {/* 최상위 댓글 작성 폼 */}
               <form onSubmit={handleCommentSubmit} className="mt-6">
                 <textarea
                   rows={3}
