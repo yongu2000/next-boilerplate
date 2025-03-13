@@ -34,7 +34,7 @@ axiosInstance.interceptors.request.use(
 const reissueAccessToken = async () => {
   try {
     const response = await axios.post(
-      `${API_URL}/token/header`,
+      `${API_URL}/token/reissue`,
       {},
       { withCredentials: true }
     );

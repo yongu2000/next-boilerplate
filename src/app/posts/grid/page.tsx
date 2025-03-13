@@ -51,7 +51,7 @@ export default function GridPostsPage() {
             {/* 글쓰기 버튼 추가 */}
             <div className="mb-6 flex justify-end">
                 <Link
-                    href="/posts/write"
+                    href="/posts/new"
                     className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
