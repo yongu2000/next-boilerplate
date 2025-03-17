@@ -6,6 +6,9 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // 인증 관련 처리를 위한 함수

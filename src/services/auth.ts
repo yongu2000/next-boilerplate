@@ -60,6 +60,25 @@ export const authService = {
     };
     
     await axiosInstance.post('/join', joinData);
+  },
+
+  async refresh(): Promise<string> {
+    const response = await axiosInstance.post('/auth/refresh');
+    return response.data;
+  },
+
+  async reissueToken(): Promise<string> {
+    const response = await axiosInstance.post('/token/reissue');
+    
+    const authHeader = response.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('Access Token이 없습니다.');
+    }
+    
+    const accessToken = authHeader.split('Bearer ')[1];
+    localStorage.setItem('accessToken', accessToken);
+    
+    return accessToken;
   }
 };
 
