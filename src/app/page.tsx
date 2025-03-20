@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import Link from 'next/link';
+import { getCookie } from 'cookies-next';
 
 export default function HomePage() {
   const { user, setAuth } = useAuth();
@@ -13,6 +14,10 @@ export default function HomePage() {
       try {
         // 이미 인증 정보가 있다면 스킵
         if (user) return;
+
+        // refreshToken 쿠키가 있는지 확인
+        const refreshToken = getCookie('REFRESH_TOKEN');
+        if (!refreshToken) return;
 
         // 1. 토큰 재발급 요청
         const accessToken = await authService.reissueToken();

@@ -1,6 +1,20 @@
 import { axiosInstance } from './axios';
 import { Post, PostPage, PostSummary, CursorResponse } from '@/types/post';
 
+export interface PostSearchParams {
+  page?: number;
+  size?: number;
+  searchType?: 'title' | 'content' | 'author';
+  searchKeyword?: string;
+  sortBy?: 'date' | 'likes' | 'comments' | 'views';
+  sortDirection?: 'asc' | 'desc';
+  minViewCounts?: number;
+  minCommentCounts?: number;
+  minLikes?: number;
+  startDate?: string;  // YYYY-MM-DD 형식
+  endDate?: string;    // YYYY-MM-DD 형식
+}
+
 export const postService = {
   async getMyPosts(): Promise<Post[]> {
     const response = await axiosInstance.get('/posts/my');
@@ -67,6 +81,53 @@ async getAllPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<Pos
 
   async deleteComment(postId: number, commentId: number): Promise<void> {
     await axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
+  },
+
+  async getFilteredPosts(params: PostSearchParams): Promise<PostPage> {
+    const searchParams = new URLSearchParams();
+    
+    // 페이지네이션
+    searchParams.append('page', (params.page || 0).toString());
+    searchParams.append('size', (params.size || 10).toString());
+    
+    // 검색 조건
+    if (params.searchType) {
+      searchParams.append('searchType', params.searchType);
+    }
+    if (params.searchKeyword) {
+      searchParams.append('searchKeyword', params.searchKeyword);
+    }
+    
+    // 정렬 조건
+    if (params.sortBy) {
+      searchParams.append('sortBy', params.sortBy);
+      searchParams.append('sortDirection', params.sortDirection || 'desc');
+    }
+    
+    // 필터 조건 - 파라미터 이름 일치시키기
+    if (params.minViewCounts && params.minViewCounts > 0) {
+      searchParams.append('minViewCounts', params.minViewCounts.toString());
+    }
+    if (params.minCommentCounts && params.minCommentCounts > 0) {
+      searchParams.append('minCommentCounts', params.minCommentCounts.toString());
+    }
+    if (params.minLikes && params.minLikes > 0) {
+      searchParams.append('minLikes', params.minLikes.toString());
+    }
+    
+    // 검색 기간
+    if (params.startDate) {
+      searchParams.append('startDate', params.startDate);
+    }
+    if (params.endDate) {
+      searchParams.append('endDate', params.endDate);
+    }
+
+    // 디버깅용 로그
+    console.log('Request parameters:', Object.fromEntries(searchParams.entries()));
+    
+    const response = await axiosInstance.get(`/posts/list?${searchParams}`);
+    return response.data;
   }
 };
 
