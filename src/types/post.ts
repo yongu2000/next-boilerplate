@@ -57,3 +57,21 @@ export interface PostPage {
   size: number;
   number: number;
 }
+
+export type PostSearchType = 'title' | 'content' | 'author';
+export type PostSortBy = 'date' | 'views' | 'likes' | 'comments';
+export type PostSortDirection = 'asc' | 'desc';
+
+export interface PostSearchParams {
+    page?: number;
+    size?: number;
+    searchType?: PostSearchType;
+    searchKeyword?: string;
+    sortBy?: PostSortBy;
+    sortDirection?: PostSortDirection;
+    minViewCounts?: number;
+    minCommentCounts?: number;
+    minLikes?: number;
+    startDate?: string;
+    endDate?: string;
+}

@@ -26,12 +26,17 @@ export const postService = {
     return response.data;
 },
 
-async getAllPostsByCursor(cursor?: number, size = 9): Promise<CursorResponse<PostSummary>> {
+async getAllPostsByCursor(cursor?: number, searchParams?: PostSearchParams) {
   const params = new URLSearchParams();
   if (cursor) params.append('cursor', cursor.toString());
-  params.append('size', size.toString());
-  
-  const response = await axiosInstance.get(`/posts/grid?${params}`);
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') {
+        params.append(key, value.toString());
+      }
+    });
+  }
+  const response = await axiosInstance.get(`/posts/grid?${params.toString()}`);
   return response.data;
 },
 
