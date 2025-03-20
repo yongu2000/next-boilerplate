@@ -16,7 +16,11 @@ export const handleAuthError = () => {
   localStorage.removeItem('accessToken');
   const authStore = useAuth.getState();
   authStore.clearAuth();
-  window.location.href = '/login';
+  
+  // 로그인 페이지가 아닐 때만 새로고침
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
 };
 
 // API 요청 시 인터셉터를 통해 Access Token 자동 첨부

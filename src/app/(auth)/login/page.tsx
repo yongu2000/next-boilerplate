@@ -12,21 +12,26 @@ import { toast } from 'react-hot-toast';
 const loginSchema = z.object({
   email: z.string().email('올바른 이메일을 입력해주세요'),
   password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다'),
+  rememberMe: z.boolean().optional(),
 });
 
 export default function LoginPage() {
   const router = useRouter();
   const { setAuth } = useAuth();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
   });
   
+  const rememberMe = watch('rememberMe');
+
   const onSubmit = async (data: any) => {
     try {
+      console.log('로그인 시도:', data);
       // 1. 먼저 로그인
       await authService.login({
         username: data.email,
-        password: data.password
+        password: data.password,
+        rememberMe: data.rememberMe
       });
       
       // 2. 로그인 성공 후 사용자 정보 요청
@@ -77,10 +82,41 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">아이디 찾기</span>
-            <span className="text-gray-600">비밀번호 찾기</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                {...register('rememberMe')}
+                type="checkbox"
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                로그인 상태 유지
+              </label>
+            </div>
+            <div className="text-sm">
+              <span className="text-gray-600">아이디 찾기</span>
+              <span className="mx-2 text-gray-300">|</span>
+              <span className="text-gray-600">비밀번호 찾기</span>
+            </div>
           </div>
+
+          {rememberMe && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    로그인 상태 유지를 선택하면 30일 동안 자동 로그인이 유지됩니다. 
+                    공용 컴퓨터에서는 보안을 위해 선택하지 마세요.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3">
             <button

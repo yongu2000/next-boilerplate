@@ -11,7 +11,11 @@ interface JoinRequest {
 
 export const authService = {
   async login(data: LoginRequest): Promise<string> {
-    const response = await axiosInstance.post('/login', data);
+    const response = await axiosInstance.post('/login', {
+      username: data.username,
+      password: data.password,
+      rememberMe: data.rememberMe || false
+    });
     
     const authHeader = response.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
