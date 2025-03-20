@@ -83,6 +83,35 @@ export const authService = {
     localStorage.setItem('accessToken', accessToken);
     
     return accessToken;
+  },
+
+  async updateProfile(data: { 
+    name: string; 
+    bio: string; 
+    profileImage: File | null;
+    email: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }): Promise<void> {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('bio', data.bio);
+    formData.append('email', data.email);
+    
+    if (data.profileImage) {
+      formData.append('profileImage', data.profileImage);
+    }
+    
+    if (data.currentPassword && data.newPassword) {
+      formData.append('currentPassword', data.currentPassword);
+      formData.append('newPassword', data.newPassword);
+    }
+    
+    await axiosInstance.put('/user/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 };
 
