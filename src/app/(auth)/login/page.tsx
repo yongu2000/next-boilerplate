@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-hot-toast';
 
 const loginSchema = z.object({
-  email: z.string().email('올바른 이메일을 입력해주세요'),
+  username: z.string().min(1, '아이디를 입력해주세요'),
   password: z.string().min(6, '비밀번호는 최소 6자 이상이어야 합니다'),
   rememberMe: z.boolean().optional(),
 });
@@ -29,7 +29,7 @@ export default function LoginPage() {
       console.log('로그인 시도:', data);
       // 1. 먼저 로그인
       await authService.login({
-        username: data.email,
+        username: data.username,
         password: data.password,
         rememberMe: data.rememberMe
       });
@@ -44,7 +44,7 @@ export default function LoginPage() {
       router.push('/');
     } catch (error) {
       console.error('로그인 실패:', error);
-      toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+      toast.error('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
     }
   };
 
@@ -60,13 +60,13 @@ export default function LoginPage() {
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <input
-                {...register('email')}
-                type="email"
-                placeholder="아이디"
+                {...register('username')}
+                type="text"
+                placeholder="아이디 또는 이메일"
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message as string}</p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username.message as string}</p>
               )}
             </div>
             <div>

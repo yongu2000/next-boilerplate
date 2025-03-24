@@ -4,9 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface JoinRequest {
   email: string;
-  username: string;
   password: string;
-  name: string;
 }
 
 export const authService = {
@@ -56,14 +54,7 @@ export const authService = {
   },
 
   async join(data: { email: string; password: string }): Promise<void> {
-    const joinData: JoinRequest = {
-      email: data.email,
-      username: data.email,
-      password: data.password,
-      name: data.email.split('@')[0]
-    };
-    
-    await axiosInstance.post('/join', joinData);
+    await axiosInstance.post('/join', data);
   },
 
   async refresh(): Promise<string> {
