@@ -6,8 +6,18 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import { toast } from 'react-hot-toast';
+import { useEffect } from 'react';
 
-const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/, "/posts/grid", "/posts/list", /^\/[^/]+$/];
+const publicRoutes = [
+  "/", 
+  "/login", 
+  "/join", 
+  /^\/posts\/\d+$/, 
+  "/posts/grid", 
+  "/posts/list", 
+  /^\/[^/]+$/, 
+  /^\/[^/]+\/posts$/  // 사용자의 게시글 목록 페이지
+];
 
 export default function ClientLayout({
   children,
@@ -15,8 +25,12 @@ export default function ClientLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading, initializeAuth } = useAuth();
   
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
   const isPublicRoute = publicRoutes.some((route) =>
     typeof route === "string" ? route === pathname : route.test(pathname)
   );
@@ -41,7 +55,9 @@ export default function ClientLayout({
               </span>
             </Link>
             <div>
-              {isAuthenticated ? (
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-indigo-500"></div>
+              ) : isAuthenticated ? (
                 <div className="flex items-center gap-6">
                   <span className="text-gray-700 font-medium">
                     환영합니다, <span className="text-indigo-600">{user?.name}</span>님

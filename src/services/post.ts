@@ -133,7 +133,17 @@ async getAllPostsByCursor(cursor?: number, searchParams?: PostSearchParams) {
     
     const response = await axiosInstance.get(`/posts/list?${searchParams}`);
     return response.data;
-  }
+  },
+
+  async getUserPosts(username: string, params: PostSearchParams): Promise<PostPage> {
+    const response = await axiosInstance.get(`/posts/${username}/list`, { params });
+    return response.data;
+  },
+
+  async getUserLikes(username: string, params: PostSearchParams): Promise<CursorResponse<PostSummary>> {
+    const response = await axiosInstance.get(`/posts/${username}/like/grid`, { params });
+    return response.data;
+  },
 };
 
 export default postService;

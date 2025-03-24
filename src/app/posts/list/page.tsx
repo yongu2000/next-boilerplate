@@ -425,61 +425,69 @@ export default function ListPostsPage() {
 
             {/* 테이블 영역 */}
             <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                번호
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                제목
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                작성자
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                작성일
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                조회수
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                좋아요
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {posts.map((post) => (
-                            <tr key={post.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {post.id}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <Link href={`/posts/${post.id}`} className="text-indigo-600 hover:text-indigo-900">
-                                        {post.title}
-                                        {post.commentCounts > 0 && (
-                                            <span className="ml-2 text-gray-500">
-                                                [{post.commentCounts}]
-                                            </span>
-                                        )}
-                                    </Link>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {post.user.name}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {format(new Date(post.createdAt), 'yyyy.MM.dd', { locale: ko })}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {post.viewCounts}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {post.likes}
-                                </td>
+                {posts.length === 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-gray-500 text-lg">게시글이 없습니다.</p>
+                    </div>
+                ) : (
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    번호
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    제목
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    작성자
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    작성일
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    조회수
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    좋아요
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {posts.map((post) => (
+                                <tr key={post.id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {post.id}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <Link href={`/posts/${post.id}`} className="text-indigo-600 hover:text-indigo-900">
+                                            {post.title}
+                                            {post.commentCounts > 0 && (
+                                                <span className="ml-2 text-gray-500">
+                                                    [{post.commentCounts}]
+                                                </span>
+                                            )}
+                                        </Link>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <Link href={`/${post.user.username}`} className="text-indigo-600 hover:text-indigo-900">
+                                            {post.user.name}
+                                        </Link>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {format(new Date(post.createdAt), 'yyyy.MM.dd', { locale: ko })}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {post.viewCounts}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {post.likes}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
             <Pagination 
                 currentPage={page} 

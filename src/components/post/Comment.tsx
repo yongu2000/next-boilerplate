@@ -5,6 +5,7 @@ import { Comment } from '@/types/post';
 import { useAuth } from '@/hooks/useAuth';
 import { postService } from '@/services/post';
 import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 
 interface CommentProps {
   comment: Comment;
@@ -90,7 +91,9 @@ export default function CommentComponent({ comment, postId, onDelete, onReply, o
           <>
             <div className="flex justify-between items-start">
               <div>
-                <span className="font-medium text-gray-900">{comment.user.name}</span>
+                <Link href={`/${comment.user.username}`} className="font-medium text-gray-900 hover:text-indigo-600">
+                  {comment.user.name}
+                </Link>
                 <p className="mt-1 text-gray-700">{comment.content}</p>
                 <div className="mt-2 text-sm text-gray-500 flex items-center gap-2">
                   <span>{formatDateTime(comment.modifiedAt)}</span>

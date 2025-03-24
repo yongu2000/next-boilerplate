@@ -44,7 +44,7 @@ export default function PostHeader({
             </div>
             <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
                 <div className="flex items-center space-x-4">
-                    <span>작성자: {post.user.name}</span>
+                    <span>작성자: <Link href={`/${post.user.username}`} className="text-indigo-600 hover:text-indigo-500">{post.user.name}</Link></span>
                     <span>작성일: {new Date(post.createdAt).toLocaleDateString()}</span>
                     {post.modifiedAt !== post.createdAt && (
                         <span>수정일: {new Date(post.modifiedAt).toLocaleDateString()}</span>

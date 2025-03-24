@@ -37,6 +37,7 @@ export interface Post {
     user: {
       id: number;
       name: string;
+      username: string;
     };
     parentCommentId: number | null;
     replies: Comment[];

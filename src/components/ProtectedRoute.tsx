@@ -6,19 +6,25 @@ import { useEffect, useState } from "react";
 
 // 보호된 라우트를 감싸는 컴포넌트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.replace("/login"); // 🔥 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-    } else {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/login");
+    } else if (!isLoading) {
       setLoading(false);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
-  if (loading) return null; // ✅ 리다이렉트 중 화면 깜빡임 방지 (로딩 상태)
+  if (loading || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 };

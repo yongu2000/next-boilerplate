@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import CommentComponent from '@/components/post/Comment';
 import PostHeader from '@/components/post/PostHeader';
+import Image from 'next/image';
 
 export default function PostDetailPage() {
   const params = useParams();
