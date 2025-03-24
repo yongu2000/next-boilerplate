@@ -1,5 +1,5 @@
 import { axiosInstance } from './axios';
-import { LoginRequest, UserUpdateRequest, UserInfo } from '@/types/auth';
+import { LoginRequest, UserUpdateRequest, UserInfo, PublicUserInfo } from '@/types/auth';
 import { useAuth } from '@/hooks/useAuth';
 
 interface JoinRequest {
@@ -27,16 +27,50 @@ export const authService = {
   },
 
   async getUserInfo(): Promise<UserInfo> {
-    const response = await axiosInstance.get('/user');
+    const response = await axiosInstance.get('/user/my');
     return response.data;
   },
 
-  async updateUser(data: UserUpdateRequest): Promise<void> {
-    await axiosInstance.put('/user', data);
+  async updateUser(username: string, data: UserUpdateRequest): Promise<void> {
+    const response = await axiosInstance.put(`/user/${username}`, {
+      name: data.name,
+      bio: data.bio,
+      email: data.email,
+      username: data.username,
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
+
+    // username이 변경된 경우 새로운 토큰이 헤더에 포함됨
+    const authHeader = response.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const newAccessToken = authHeader.split('Bearer ')[1];
+      localStorage.setItem('accessToken', newAccessToken);
+      
+      // auth store의 user 정보도 업데이트
+      const authStore = useAuth.getState();
+      if (authStore.user && data.username) {
+        authStore.setAuth({
+          ...authStore.user,
+          username: data.username
+        });
+      }
+    }
+  },
+
+  async updateProfileImage(username: string, profileImage: File): Promise<void> {
+    const formData = new FormData();
+    formData.append('profileImage', profileImage);
+    
+    await axiosInstance.put(`/user/${username}/profile-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 
   async getCurrentUser(): Promise<UserInfo> {
-    const response = await axiosInstance.get('/user');
+    const response = await axiosInstance.get('/user/my');
     return response.data;
   },
 
@@ -76,33 +110,19 @@ export const authService = {
     return accessToken;
   },
 
-  async updateProfile(data: { 
-    name: string; 
-    bio: string; 
-    profileImage: File | null;
-    email: string;
-    currentPassword?: string;
-    newPassword?: string;
-  }): Promise<void> {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('bio', data.bio);
-    formData.append('email', data.email);
-    
-    if (data.profileImage) {
-      formData.append('profileImage', data.profileImage);
-    }
-    
-    if (data.currentPassword && data.newPassword) {
-      formData.append('currentPassword', data.currentPassword);
-      formData.append('newPassword', data.newPassword);
-    }
-    
-    await axiosInstance.put('/user/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+  async getUserByUsername(username: string): Promise<PublicUserInfo> {
+    const response = await axiosInstance.get(`/user/${username}`);
+    return response.data;
+  },
+
+  async checkUsernameDuplicate(username: string): Promise<boolean> {
+    const response = await axiosInstance.get(`/user/check/username/${username}`);
+    return response.data.isDuplicate;
+  },
+
+  async checkEmailDuplicate(email: string): Promise<boolean> {
+    const response = await axiosInstance.get(`/user/check/email/${email}`);
+    return response.data.isDuplicate;
   }
 };
 

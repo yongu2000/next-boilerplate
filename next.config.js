@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   images: {
-    domains: ['ui-avatars.com'],
+    domains: ['localhost'],
   },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig; 

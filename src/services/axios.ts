@@ -23,20 +23,6 @@ export const handleAuthError = () => {
   }
 };
 
-// API 요청 시 인터셉터를 통해 Access Token 자동 첨부
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 // 토큰 재발급을 위한 함수
 const reissueAccessToken = async () => {
   try {
@@ -96,7 +82,12 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // 3. 그 외 모든 에러는 컴포넌트에서 처리
+    // 3. 404 에러는 단순히 에러 메시지만 표시
+    if (error.response?.status === 404) {
+      return Promise.reject(new Error('요청하신 페이지를 찾을 수 없습니다.'));
+    }
+
+    // 4. 그 외 모든 에러는 컴포넌트에서 처리
     return Promise.reject(error);
   }
 );

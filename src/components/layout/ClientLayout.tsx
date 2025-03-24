@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { authService } from '@/services/auth';
 import { toast } from 'react-hot-toast';
 
-const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/, "/posts/grid", "/posts/list"];
+const publicRoutes = ["/", "/login", "/join", /^\/posts\/\d+$/, "/posts/grid", "/posts/list", /^\/[^/]+$/];
 
 export default function ClientLayout({
   children,
@@ -47,10 +47,10 @@ export default function ClientLayout({
                     환영합니다, <span className="text-indigo-600">{user?.name}</span>님
                   </span>
                   <Link
-                    href="/mypage"
+                    href={`/${user?.username}`}
                     className="text-gray-700 hover:text-indigo-600 transition-colors duration-200 font-medium"
                   >
-                    마이페이지
+                    프로필
                   </Link>
                   <button
                     onClick={handleLogout}
