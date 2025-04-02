@@ -7,6 +7,7 @@ import { UserInfo } from '@/types/auth';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
+import { getProfileImageUrl } from '@/utils/image';
 
 export default function EditProfile({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = use(params);
@@ -37,6 +38,7 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
       isChecked: false,
     },
   });
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   useEffect(() => {
     // 자기 자신의 프로필이 아닌 경우 메인 프로필 페이지로 리다이렉트
@@ -69,6 +71,11 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
 
     loadUserInfo();
   }, [resolvedParams.username, user?.username, router]);
+
+  useEffect(() => {
+    console.log('userInfo:', userInfo);
+    console.log('profileImageUrl:', userInfo?.profileImageUrl);
+  }, [userInfo]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,38 +153,10 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
     e.preventDefault();
     setIsSubmitting(true);
 
-    // 비밀번호 일치 여부 검증
-    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      toast.error('새 비밀번호가 일치하지 않습니다.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    // username이나 email이 변경된 경우 중복 확인이 필요합니다.
-    if (formData.username !== userInfo?.username && !validation.username.isChecked) {
-      toast.error('사용자 이름 중복 확인을 해주세요.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (formData.email !== userInfo?.email && !validation.email.isChecked) {
-      toast.error('이메일 중복 확인을 해주세요.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    // 중복된 값이 있는 경우 제출을 막습니다.
-    if (validation.username.isDuplicate || validation.email.isDuplicate) {
-      toast.error('중복된 값이 있습니다. 다시 확인해주세요.');
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      // 프로필 이미지가 있는 경우 먼저 업로드
+      // 이미지가 선택되어 있다면 먼저 업로드
       if (formData.profileImage) {
         await authService.updateProfileImage(resolvedParams.username, formData.profileImage);
-        toast.success('프로필 이미지가 업데이트되었습니다.');
       }
 
       // 나머지 사용자 정보 업데이트
@@ -225,7 +204,7 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
               <div className="flex flex-col items-center">
                 <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-gray-200">
                   <Image
-                    src={previewUrl || '/exampleProfile.jpg'}
+                    src={previewUrl || getProfileImageUrl(userInfo?.profileImageUrl)}
                     alt="프로필 이미지"
                     fill
                     className="object-cover"

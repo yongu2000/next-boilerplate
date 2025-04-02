@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 import { PublicUserInfo } from '@/types/auth';
 import Link from 'next/link';
+import { getProfileImageUrl } from '@/utils/image';
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = use(params);
@@ -56,7 +57,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
               <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-white bg-white">
                 <Image
-                  src="/exampleProfile.jpg"
+                  src={getProfileImageUrl(profileUser.profileImageUrl)}
                   alt="프로필 이미지"
                   fill
                   className="object-cover"

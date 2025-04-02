@@ -46,23 +46,23 @@ export const authService = {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const newAccessToken = authHeader.split('Bearer ')[1];
       localStorage.setItem('accessToken', newAccessToken);
-      
-      // auth store의 user 정보도 업데이트
-      const authStore = useAuth.getState();
-      if (authStore.user && data.username) {
-        authStore.setAuth({
-          ...authStore.user,
-          username: data.username
-        });
-      }
+    }
+    
+    // 응답으로 받은 유저 정보로 auth store 업데이트
+    const authStore = useAuth.getState();
+    if (authStore.user) {
+      authStore.setAuth({
+        ...authStore.user,
+        ...response.data  // 서버에서 받은 최신 유저 정보로 업데이트
+      });
     }
   },
 
   async updateProfileImage(username: string, profileImage: File): Promise<void> {
     const formData = new FormData();
-    formData.append('profileImage', profileImage);
+    formData.append('image', profileImage);
     
-    await axiosInstance.put(`/user/${username}/profile-image`, formData, {
+    await axiosInstance.post(`/user/${username}/image`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
