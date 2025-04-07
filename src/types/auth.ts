@@ -28,10 +28,11 @@ export interface AuthResponse {
 }
 
 export interface UserUpdateRequest {
-  currentPassword: string;
-  newPassword?: string;
   name?: string;
   bio?: string;
   email?: string;
   username?: string;
+  currentPassword?: string;
+  newPassword?: string;
+  profileImageUrl?: string;
 }

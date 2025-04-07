@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
+import { imageService } from '@/services/image';
 import { UserInfo } from '@/types/auth';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
@@ -156,18 +157,28 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
     try {
       // 이미지가 선택되어 있다면 먼저 업로드
       if (formData.profileImage) {
-        await authService.updateProfileImage(resolvedParams.username, formData.profileImage);
+        const imageUrl = await imageService.uploadImage(formData.profileImage);
+        // 이미지 URL을 사용자 정보 업데이트에 포함
+        await authService.updateUser(resolvedParams.username, {
+          name: formData.name,
+          bio: formData.bio,
+          email: formData.email,
+          username: formData.username,
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+          profileImageUrl: imageUrl
+        });
+      } else {
+        // 이미지가 없는 경우 기존 정보만 업데이트
+        await authService.updateUser(resolvedParams.username, {
+          name: formData.name,
+          bio: formData.bio,
+          email: formData.email,
+          username: formData.username,
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword
+        });
       }
-
-      // 나머지 사용자 정보 업데이트
-      await authService.updateUser(resolvedParams.username, {
-        name: formData.name,
-        bio: formData.bio,
-        email: formData.email,
-        username: formData.username,
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword,
-      });
 
       toast.success('프로필이 업데이트되었습니다.');
       

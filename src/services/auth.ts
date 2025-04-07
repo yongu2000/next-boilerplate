@@ -2,11 +2,6 @@ import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo, PublicUserInfo } from '@/types/auth';
 import { useAuth } from '@/hooks/useAuth';
 
-interface JoinRequest {
-  email: string;
-  password: string;
-}
-
 export const authService = {
   async login(data: LoginRequest): Promise<string> {
     const response = await axiosInstance.post('/login', {
@@ -39,14 +34,8 @@ export const authService = {
       username: data.username,
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
+      profileImageUrl: data.profileImageUrl,
     });
-
-    // username이 변경된 경우 새로운 토큰이 헤더에 포함됨
-    const authHeader = response.headers['authorization'];
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const newAccessToken = authHeader.split('Bearer ')[1];
-      localStorage.setItem('accessToken', newAccessToken);
-    }
     
     // 응답으로 받은 유저 정보로 auth store 업데이트
     const authStore = useAuth.getState();
@@ -56,17 +45,6 @@ export const authService = {
         ...response.data  // 서버에서 받은 최신 유저 정보로 업데이트
       });
     }
-  },
-
-  async updateProfileImage(username: string, profileImage: File): Promise<void> {
-    const formData = new FormData();
-    formData.append('image', profileImage);
-    
-    await axiosInstance.post(`/user/${username}/image`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
   },
 
   async getCurrentUser(): Promise<UserInfo> {
