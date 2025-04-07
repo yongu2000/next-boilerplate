@@ -10,6 +10,9 @@ import Link from 'next/link';
 import CommentComponent from '@/components/post/Comment';
 import PostHeader from '@/components/post/PostHeader';
 import Image from 'next/image';
+import DOMPurify from 'dompurify';
+import 'ckeditor5/ckeditor5.css';
+import '../new/editor.css';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -213,8 +216,8 @@ export default function PostDetailPage() {
               isAuthor={user?.id === post.user.id}
             />
 
-            <div className="prose max-w-none">
-              <p className="whitespace-pre-wrap text-gray-800">{post.content}</p>
+            <div className="prose max-w-none ck-content">
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
             </div>
 
             <div className="mt-12">
