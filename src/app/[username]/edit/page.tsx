@@ -196,6 +196,21 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      await authService.deleteUser(resolvedParams.username);
+      toast.success('회원탈퇴가 완료되었습니다.');
+      router.push('/login');
+    } catch (error) {
+      console.error('회원탈퇴 실패:', error);
+      toast.error('회원탈퇴에 실패했습니다.');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -384,20 +399,29 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
               </div>
 
               {/* 버튼 */}
-              <div className="flex justify-end space-x-4">
+              <div className="flex justify-between items-center">
                 <button
                   type="button"
-                  onClick={() => router.push(`/${resolvedParams.username}`)}
-                  className="h-10 px-6 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={handleDeleteAccount}
+                  className="text-sm text-red-600 hover:text-red-700"
                 >
-                  취소
+                  회원탈퇴
                 </button>
-                <button
-                  type="submit"
-                  className="h-10 px-6 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  저장
-                </button>
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/${resolvedParams.username}`)}
+                    className="h-10 px-6 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="h-10 px-6 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    저장
+                  </button>
+                </div>
               </div>
             </form>
           </div>

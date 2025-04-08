@@ -101,7 +101,12 @@ export const authService = {
   async checkEmailDuplicate(email: string): Promise<boolean> {
     const response = await axiosInstance.get(`/user/check/email/${email}`);
     return response.data.isDuplicate;
-  }
+  },
+
+  deleteUser: async (username: string) => {
+    const response = await axiosInstance.delete(`/user/${username}`);
+    return response.data;
+  },
 };
 
 // API 요청 시 인터셉터를 통해 Access Token 자동 첨부 (Bearer 포함)

@@ -42,6 +42,9 @@ export default function RegisterPage() {
       setTimer((prev) => {
         if (prev === null || prev <= 0) {
           clearInterval(interval);
+          if (!isEmailVerified) {
+            toast.error('인증 시간이 만료되었습니다. 인증코드를 다시 전송해주세요.');
+          }
           return null;
         }
         return prev - 1;
@@ -49,7 +52,7 @@ export default function RegisterPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [timer, isEmailVerified]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -59,10 +62,14 @@ export default function RegisterPage() {
 
   const handleSendVerificationCode = async () => {
     try {
-      await emailService.sendVerificationCode(email);
       setTimer(300); // 5분 = 300초
       setIsCodeSent(true);
       toast.success('인증 코드가 이메일로 전송되었습니다.');
+      
+      emailService.sendVerificationCode(email).catch((error) => {
+        console.error('인증 코드 전송 실패:', error);
+        toast.error('인증 코드 전송에 실패했습니다. 다시 시도해주세요.');
+      });
     } catch (error) {
       console.error('인증 코드 전송 실패:', error);
       toast.error('인증 코드 전송에 실패했습니다.');
