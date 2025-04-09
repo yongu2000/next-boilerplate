@@ -2,6 +2,8 @@ import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo, PublicUserInfo } from '@/types/auth';
 import { useAuth } from '@/hooks/useAuth';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+
 export const authService = {
   async login(data: LoginRequest): Promise<string> {
     const response = await axiosInstance.post('/login', {
@@ -106,6 +108,22 @@ export const authService = {
   deleteUser: async (username: string) => {
     const response = await axiosInstance.delete(`/user/${username}`);
     return response.data;
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    const response = await fetch(`${API_URL}/user/password/reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, newPassword }),
+    });
+
+    if (!response.ok) {
+      throw new Error('비밀번호 재설정에 실패했습니다.');
+    }
+
+    return;
   },
 };
 

@@ -11,11 +11,13 @@ export const emailService = {
     return response.data;
   },
 
-  verifyCode: async (email: string, code: string) => {
-    const response = await axiosInstance.post<VerifyCodeResponse>('/email/verify/code', {
-      email,
-      code
-    });
+  verifyCode: async (email: string, code: string): Promise<VerifyCodeResponse> => {
+    const response = await axiosInstance.post('/email/verify/code', { email, code });
     return response.data;
-  }
+  },
+
+  sendPasswordResetEmail: async (email: string): Promise<null> => {
+    await axiosInstance.post('/email/send/password/reset', { email });
+    return null;
+  },
 }; 

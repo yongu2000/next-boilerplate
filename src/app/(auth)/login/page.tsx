@@ -94,9 +94,9 @@ export default function LoginPage() {
               </label>
             </div>
             <div className="text-sm">
-              <span className="text-gray-600">아이디 찾기</span>
-              <span className="mx-2 text-gray-300">|</span>
-              <span className="text-gray-600">비밀번호 찾기</span>
+              <Link href="/find-password" className="text-indigo-600 hover:text-indigo-500">
+                비밀번호 찾기
+              </Link>
             </div>
           </div>
 
