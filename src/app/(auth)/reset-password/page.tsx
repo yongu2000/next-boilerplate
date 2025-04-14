@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,10 +21,9 @@ const resetPasswordSchema = z.object({
   path: ["passwordConfirm"],
 });
 
-export default function ResetPasswordPage() {
+// 비밀번호 재설정 폼 컴포넌트
+function ResetPasswordForm({ token }: { token: string | null }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(resetPasswordSchema)
@@ -142,14 +141,14 @@ export default function ResetPasswordPage() {
                 <div className="ml-3">
                   <p className="text-sm text-green-700">
                     비밀번호가 성공적으로 재설정되었습니다.<br />
-                    로그인 페이지로 이동합니다.
+                    로그인 페이지로 이동하여 새 비밀번호로 로그인해주세요.
                   </p>
                 </div>
               </div>
             </div>
             <div className="text-center">
               <Link href="/login" className="text-sm text-indigo-600 hover:text-indigo-500">
-                로그인하기
+                로그인 페이지로 이동
               </Link>
             </div>
           </div>
@@ -157,4 +156,25 @@ export default function ResetPasswordPage() {
       </div>
     </div>
   );
+}
+
+// 메인 컴포넌트
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+// useSearchParams를 사용하는 컴포넌트
+function ResetPasswordContent() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+  
+  return <ResetPasswordForm token={token} />;
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { postService } from '@/services/post';
 import { PostSummary, PostSearchParams, PostSearchType, PostSortBy, PostSortDirection } from '@/types/post';
@@ -38,6 +38,11 @@ export default function GridPostsPage() {
     const [customMinViewCounts, setCustomMinViewCounts] = useState('');
     const [customMinCommentCounts, setCustomMinCommentCounts] = useState('');
     const [customMinLikes, setCustomMinLikes] = useState('');
+
+    // 컴포넌트가 마운트될 때 한 번만 실행
+    useEffect(() => {
+        fetchPosts();
+    }, []);
 
     const fetchPosts = async (cursor?: number) => {
         if (isLoading) return;
@@ -103,10 +108,6 @@ export default function GridPostsPage() {
         }
     };
 
-    useEffect(() => {
-        fetchPosts();
-    }, [searchParams, dateRange, startDate, endDate, searchType, searchKeyword, customMinViewCounts, customMinCommentCounts, customMinLikes]);
-
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setPosts([]);
@@ -124,6 +125,7 @@ export default function GridPostsPage() {
         setPosts([]);
         setNextCursor(null);
         setHasMore(true);
+        fetchPosts();
     };
 
     const handleFilterChange = (key: keyof PostSearchParams, value: number) => {
@@ -134,6 +136,7 @@ export default function GridPostsPage() {
         setPosts([]);
         setNextCursor(null);
         setHasMore(true);
+        fetchPosts();
     };
 
     const handleDateRangeChange = (value: typeof DATE_RANGE_OPTIONS[number]['value']) => {
@@ -145,6 +148,7 @@ export default function GridPostsPage() {
         setPosts([]);
         setNextCursor(null);
         setHasMore(true);
+        fetchPosts();
     };
 
     const handleResetFilters = () => {
@@ -163,6 +167,7 @@ export default function GridPostsPage() {
         setPosts([]);
         setNextCursor(null);
         setHasMore(true);
+        fetchPosts();
     };
 
     return (
