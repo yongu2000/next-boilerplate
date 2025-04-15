@@ -449,7 +449,7 @@ export default function GridPostsPage() {
                                     {post.title}
                                 </h3>
                                 <p className="text-gray-600 line-clamp-3">
-                                    {post.content}
+                                    {post.content.replace(/<[^>]*>/g, '')}
                                 </p>
                                 <div className="mt-4 flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
