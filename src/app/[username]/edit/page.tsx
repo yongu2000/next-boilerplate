@@ -232,6 +232,7 @@ export default function EditProfile({ params }: { params: Promise<{ username: st
                   <Image
                     src={previewUrl || getProfileImageUrl(userInfo?.profileImageUrl)}
                     alt="프로필 이미지"
+                    unoptimized={true}
                     fill
                     className="object-cover"
                   />

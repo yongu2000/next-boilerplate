@@ -60,6 +60,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                   src={getProfileImageUrl(profileUser.profileImageUrl)}
                   alt="프로필 이미지"
                   fill
+                  unoptimized={true}
                   className="object-cover"
                 />
               </div>

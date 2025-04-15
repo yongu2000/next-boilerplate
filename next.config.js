@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+require('dotenv').config();
+
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -6,6 +8,11 @@ const nextConfig = {
   reactStrictMode: false,
   images: {
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: "https://boilerplate-image.s3.ap-southeast-2.amazonaws.com",
+        pathname: '/**',
+      },
       {
         protocol: 'http',
         hostname: 'localhost',
