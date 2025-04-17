@@ -130,7 +130,7 @@ export default function LoginPage() {
 
             <button
               type="button"
-              onClick={() => window.location.href = `http://${API_URL}/oauth2/authorization/kakao`}
+              onClick={() => window.location.href = `${API_URL}/oauth2/authorization/kakao`}
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-[#FEE500] hover:bg-[#FDD800] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
             >
               카카오 로그인
@@ -138,7 +138,7 @@ export default function LoginPage() {
 
             <button
               type="button"
-              onClick={() => window.location.href = `http://${API_URL}/oauth2/authorization/google`}
+              onClick={() => window.location.href = `${API_URL}/oauth2/authorization/google`}
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#4285F4] hover:bg-[#3367D6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               구글 로그인
@@ -146,7 +146,7 @@ export default function LoginPage() {
 
             <button
               type="button"
-              onClick={() => window.location.href = `http://${API_URL}/oauth2/authorization/naver`}
+              onClick={() => window.location.href = `${API_URL}/oauth2/authorization/naver`}
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#03C75A] hover:bg-[#02B150] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               네이버 로그인

@@ -26,23 +26,54 @@ export const handleAuthError = () => {
 // 토큰 재발급을 위한 함수
 const reissueAccessToken = async () => {
   try {
-    const response = await axios.post(
-      `${API_URL}/token/reissue`,
+    const response = await axiosInstance.post(
+      `/token/reissue`,
       {},
-      { withCredentials: true }
     );
-    const newAccessToken = response.headers["authorization"]?.replace("Bearer ", ""); 
-    if (newAccessToken) {
-      localStorage.setItem('accessToken', newAccessToken);
-      return newAccessToken;
-    } else {
-      throw new Error("새로운 Access Token이 응답에 포함되지 않았습니다.");
+    
+    // 응답 헤더에서 Authorization 토큰 추출
+    const authHeader = response.headers['authorization'];
+    if (!authHeader) {
+      throw new Error('토큰 재발급 응답에 Authorization 헤더가 없습니다.');
     }
+    
+    // "Bearer " 접두사 제거
+    const accessToken = authHeader.replace('Bearer ', '');
+    
+    // 새 토큰을 localStorage에 저장
+    localStorage.setItem('accessToken', accessToken);
+    
+    return accessToken;
   } catch (error) {
-    handleAuthError();
+    console.error('토큰 재발급 실패:', error);
     throw error;
   }
 };
+
+// 요청 인터셉터 추가
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // localStorage에서 accessToken 가져오기
+    const accessToken = localStorage.getItem('accessToken');
+    
+    // accessToken이 있으면 Authorization 헤더에 추가
+    if (accessToken) {
+      if (config.headers instanceof axios.AxiosHeaders) {
+        config.headers.set('Authorization', `Bearer ${accessToken}`);
+      } else {
+        // 새로운 AxiosHeaders 객체 생성
+        const newHeaders = new axios.AxiosHeaders();
+        newHeaders.set('Authorization', `Bearer ${accessToken}`);
+        config.headers = newHeaders;
+      }
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // 에러 처리 인터셉터
 axiosInstance.interceptors.response.use(
