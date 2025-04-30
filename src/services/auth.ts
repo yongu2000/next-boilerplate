@@ -2,7 +2,7 @@ import { axiosInstance } from './axios';
 import { LoginRequest, UserUpdateRequest, UserInfo, PublicUserInfo } from '@/types/auth';
 import { useAuth } from '@/hooks/useAuth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api"|| 'http://localhost:3000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api"|| 'http://localhost:8080/api';
 
 export const authService = {
   async login(data: LoginRequest): Promise<string> {

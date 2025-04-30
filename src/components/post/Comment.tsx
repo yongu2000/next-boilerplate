@@ -1,14 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { Comment } from '@/types/post';
+import { CommentResponse, CommentRepliesResponse } from '@/types/post';
 import { useAuth } from '@/hooks/useAuth';
 import { postService } from '@/services/post';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 
 interface CommentProps {
-  comment: Comment;
+  comment: CommentResponse;
+  postId: number;
+  onDelete: (commentId: number) => void;
+  onReply: (parentCommentId: number, content: string) => void;
+  onUpdate?: (commentId: number) => void;
+}
+
+interface ReplyProps {
+  comment: CommentRepliesResponse;
   postId: number;
   onDelete: (commentId: number) => void;
   onReply: (parentCommentId: number, content: string) => void;
@@ -34,6 +42,19 @@ export default function CommentComponent({ comment, postId, onDelete, onReply, o
   const [replyContent, setReplyContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
+  const [replies, setReplies] = useState<CommentRepliesResponse[]>([]);
+  const [showAllReplies, setShowAllReplies] = useState(false);
+
+  const loadMoreReplies = async () => {
+    try {
+      const newReplies = await postService.getCommentReplies(comment.id);
+      setReplies(newReplies);
+      setShowAllReplies(true);
+    } catch (error) {
+      console.error('대댓글 로드 실패:', error);
+      toast.error('대댓글을 불러오는데 실패했습니다.');
+    }
+  };
 
   const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +70,7 @@ export default function CommentComponent({ comment, postId, onDelete, onReply, o
     if (!editContent.trim()) return;
 
     try {
-      await postService.updateComment(postId, comment.id, editContent);
+      await postService.updateComment(comment.id, editContent);
       setIsEditing(false);
       if (onUpdate) onUpdate(comment.id);
       toast.success('댓글이 수정되었습니다.');
@@ -160,16 +181,116 @@ export default function CommentComponent({ comment, postId, onDelete, onReply, o
       )}
 
       {/* 답글 목록 */}
-      {comment.replies?.map((reply) => (
-        <CommentComponent
-          key={reply.id}
-          comment={reply}
-          postId={postId}
-          onDelete={onDelete}
-          onReply={onReply}
-          onUpdate={onUpdate}
-        />
-      ))}
+      {replies.length > 0 && (
+        <div className="space-y-4">
+          {replies.map((reply) => (
+            <ReplyComponent
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              onDelete={onDelete}
+              onReply={onReply}
+              onUpdate={onUpdate}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 대댓글 더보기 버튼 */}
+      {!comment.parentCommentId && !showAllReplies && (
+        <button
+          onClick={loadMoreReplies}
+          className="ml-8 text-sm text-indigo-600 hover:text-indigo-700"
+        >
+          대댓글 {comment.repliesCount}개 표시하기
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ReplyComponent({ comment, postId, onDelete, onReply, onUpdate }: ReplyProps) {
+  const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
+
+  const handleUpdateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editContent.trim()) return;
+
+    try {
+      await postService.updateComment(comment.id, editContent);
+      setIsEditing(false);
+      if (onUpdate) onUpdate(comment.id);
+      toast.success('댓글이 수정되었습니다.');
+    } catch (error) {
+      console.error('댓글 수정 실패:', error);
+      toast.error('댓글 수정에 실패했습니다.');
+    }
+  };
+
+  return (
+    <div className="ml-8 space-y-4">
+      <div className="bg-gray-50 rounded-lg p-4">
+        {isEditing ? (
+          <form onSubmit={handleUpdateSubmit} className="space-y-2">
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              rows={3}
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-3 py-1 text-sm text-gray-600 hover:text-gray-700"
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              >
+                수정완료
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="flex justify-between items-start">
+              <div>
+                <Link href={`/${comment.user.username}`} className="font-medium text-gray-900 hover:text-indigo-600">
+                  {comment.user.name}
+                </Link>
+                <p className="mt-1 text-gray-700">{comment.content}</p>
+                <div className="mt-2 text-sm text-gray-500 flex items-center gap-2">
+                  <span>{formatDateTime(comment.modifiedAt)}</span>
+                  {comment.createdAt !== comment.modifiedAt && (
+                    <span className="text-gray-400">(수정됨)</span>
+                  )}
+                </div>
+              </div>
+              {user?.id === comment.user.id && (
+                <div className="flex space-x-2 text-sm">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="text-gray-600 hover:text-indigo-600"
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => onDelete(comment.id)}
+                    className="text-gray-600 hover:text-red-600"
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

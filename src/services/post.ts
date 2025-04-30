@@ -1,5 +1,5 @@
 import { axiosInstance } from './axios';
-import { Post, PostPage, PostSummary, CursorResponse } from '@/types/post';
+import { Post, PostPage, PostSummary, CursorResponse, CommentResponse, CommentRepliesResponse } from '@/types/post';
 
 export interface PostSearchParams {
   page?: number;
@@ -77,15 +77,15 @@ async getAllPostsByCursor(cursor?: number, searchParams?: PostSearchParams) {
   },
 
   async createComment(postId: number, data: { content: string; parentCommentId: number | null }): Promise<void> {
-    await axiosInstance.post(`/posts/${postId}/comments`, data);
+    await axiosInstance.post(`/comments/${postId}`, data);
   },
 
-  async updateComment(postId: number, commentId: number, content: string): Promise<void> {
-    await axiosInstance.put(`/posts/${postId}/comments/${commentId}`, { content });
+  async updateComment(commentId: number, content: string): Promise<void> {
+    await axiosInstance.put(`/comments/${commentId}`, { content });
   },
 
-  async deleteComment(postId: number, commentId: number): Promise<void> {
-    await axiosInstance.delete(`/posts/${postId}/comments/${commentId}`);
+  async deleteComment(commentId: number): Promise<void> {
+    await axiosInstance.delete(`/comments/${commentId}`);
   },
 
   async getFilteredPosts(params: PostSearchParams): Promise<PostPage> {
@@ -142,6 +142,16 @@ async getAllPostsByCursor(cursor?: number, searchParams?: PostSearchParams) {
 
   async getUserLikes(username: string, params: PostSearchParams): Promise<CursorResponse<PostSummary>> {
     const response = await axiosInstance.get(`/posts/${username}/like/grid`, { params });
+    return response.data;
+  },
+
+  async getCommentReplies(commentId: number): Promise<CommentRepliesResponse[]> {
+    const response = await axiosInstance.get<CommentRepliesResponse[]>(`/comments/${commentId}/replies`);
+    return response.data;
+  },
+
+  async getComments(postId: number): Promise<CommentResponse[]> {
+    const response = await axiosInstance.get<CommentResponse[]>(`/comments/${postId}`);
     return response.data;
   },
 };

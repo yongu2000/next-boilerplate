@@ -1,7 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { useAuth } from '@/hooks/useAuth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL + "/api"|| 'http://localhost:8080/api';
+
 
 export const axiosInstance = axios.create({
   baseURL: API_URL,

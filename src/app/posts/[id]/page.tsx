@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { postService } from '@/services/post';
-import { Post } from '@/types/post';
+import { Post, CommentResponse, CommentRepliesResponse } from '@/types/post';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import CommentComponent from '@/components/post/Comment';
@@ -19,28 +19,32 @@ export default function PostDetailPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<CommentResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [commentContent, setCommentContent] = useState('');
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
         const postId = Number(params.id);
-        const response = await postService.getPost(postId);
-        console.log('게시글 응답:', response);
-        setPost(response);
+        const [postResponse, commentsResponse] = await Promise.all([
+          postService.getPost(postId),
+          postService.getComments(postId)
+        ]);
+        setPost(postResponse);
+        setComments(commentsResponse);
       } catch (error) {
-        console.error('글 로드 실패:', error);
-        toast.error('글을 불러오는데 실패했습니다.');
+        console.error('데이터 로드 실패:', error);
+        toast.error('데이터를 불러오는데 실패했습니다.');
         router.push('/');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPost();
+    fetchData();
   }, [params.id, router]);
 
   useEffect(() => {
@@ -112,9 +116,9 @@ export default function PostDetailPage() {
         parentCommentId: null
       });
       
-      // 댓글 작성 후 게시글 새로 불러오기
-      const response = await postService.getPost(post!.id);
-      setPost(response);
+      // 댓글 작성 후 댓글 목록 새로 불러오기
+      const response = await postService.getComments(post!.id);
+      setComments(response);
       setCommentContent(''); // 입력창 초기화
       toast.success('댓글이 작성되었습니다.');
     } catch (error) {
@@ -128,11 +132,11 @@ export default function PostDetailPage() {
     if (!window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) return;
 
     try {
-      await postService.deleteComment(post!.id, commentId);
+      await postService.deleteComment(commentId);
       
-      // 댓글 삭제 후 게시글 새로 불러오기
-      const response = await postService.getPost(post!.id);
-      setPost(response);
+      // 댓글 삭제 후 댓글 목록 새로 불러오기
+      const response = await postService.getComments(post!.id);
+      setComments(response);
       toast.success('댓글이 삭제되었습니다.');
     } catch (error) {
       console.error('댓글 삭제 실패:', error);
@@ -140,7 +144,7 @@ export default function PostDetailPage() {
     }
   };
 
-  // 대댓글 작성 핸들러 추가
+  // 대댓글 작성 핸들러
   const handleReplySubmit = async (parentCommentId: number, content: string) => {
     try {
       await postService.createComment(post!.id, {
@@ -148,9 +152,9 @@ export default function PostDetailPage() {
         parentCommentId: parentCommentId
       });
       
-      // 댓글 작성 후 게시글 새로 불러오기
-      const response = await postService.getPost(post!.id);
-      setPost(response);
+      // 대댓글 작성 후 댓글 목록 새로 불러오기
+      const response = await postService.getComments(post!.id);
+      setComments(response);
       toast.success('답글이 작성되었습니다.');
     } catch (error) {
       console.error('답글 작성 실패:', error);
@@ -158,13 +162,13 @@ export default function PostDetailPage() {
     }
   };
 
-  // 댓글 수정 후 게시글 새로 불러오기를 위한 핸들러
+  // 댓글 수정 후 댓글 목록 새로 불러오기를 위한 핸들러
   const handleCommentUpdate = async (commentId: number) => {
     try {
-      const response = await postService.getPost(post!.id);
-      setPost(response);
+      const response = await postService.getComments(post!.id);
+      setComments(response);
     } catch (error) {
-      console.error('게시글 새로고침 실패:', error);
+      console.error('댓글 목록 새로고침 실패:', error);
       toast.error('최신 댓글을 불러오는데 실패했습니다.');
     }
   };
@@ -222,9 +226,9 @@ export default function PostDetailPage() {
 
             <div className="mt-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">댓글</h2>
-              {post.comments?.length > 0 ? (
+              {comments.length > 0 ? (
                 <div className="space-y-6">
-                  {post.comments
+                  {comments
                     .filter(comment => comment.parentCommentId === null) // 최상위 댓글만 필터링
                     .map((comment) => (
                       <CommentComponent

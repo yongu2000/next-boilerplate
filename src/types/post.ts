@@ -9,7 +9,7 @@ export interface Post {
       username: string;
       name: string;
     };
-    comments: Comment[];
+    comments: CommentResponse[];
     createdAt: string;
     modifiedAt: string;
   }
@@ -31,24 +31,24 @@ export interface Post {
     modifiedAt: string;
 }
   
-  export interface Comment {
+export interface CommentResponse {
+  id: number;
+  content: string;
+  user: {
     id: number;
-    content: string;
-    user: {
-      id: number;
-      name: string;
-      username: string;
-    };
-    parentCommentId: number | null;
-    replies: Comment[];
-    createdAt: string;
-    modifiedAt: string;
-  }
+    name: string;
+    username: string;
+  };
+  parentCommentId: number | null;
+  repliesCount: number;
+  createdAt: string;
+  modifiedAt: string;
+}
 
-  export interface CursorResponse<T> {
-    items: T[];
-    nextCursor: number | null;
-    hasNext: boolean;
+export interface CursorResponse<T> {
+  items: T[];
+  nextCursor: number | null;
+  hasNext: boolean;
 }
 
 export interface PostPage {
@@ -75,4 +75,17 @@ export interface PostSearchParams {
     minLikes?: number;
     startDate?: string;
     endDate?: string;
+}
+
+export interface CommentRepliesResponse {
+  id: number;
+  content: string;
+  user: {
+    id: number;
+    name: string;
+    username: string;
+  };
+  parentCommentId: number | null;
+  createdAt: string;
+  modifiedAt: string;
 }
